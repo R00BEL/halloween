@@ -18,6 +18,9 @@ export default {
   async mounted() {
     const picture = await html2canvas(document.body);
     console.log(picture);
+    const res = await fetch("http://localhost:3000");
+    const data = await res.json();
+    console.log(data);
   },
 };
 </script>
