@@ -6,12 +6,18 @@
 
 <script>
 import template from "./templates/banana.png";
+import html2canvas from "html2canvas";
+
 export default {
   name: "App",
   data() {
     return {
       template: template,
     };
+  },
+  async mounted() {
+    const picture = await html2canvas(document.body);
+    console.log(picture);
   },
 };
 </script>
