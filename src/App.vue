@@ -15,12 +15,30 @@ export default {
       template: template,
     };
   },
+  methods: {
+    screenshot() {
+      return html2canvas(this.$refs.shootingSpace);
+    },
+    convertingCanvasToImage(canvas) {
+      const image = new Image();
+
+      image.onload = function () {
+        image.src = canvas.toDataURL("image/png");
+        image.crossOrigin = "anonymous";
+      };
+
+      return image;
+    },
+    async sendingImageToServer() {
+      const res = await fetch("http://localhost:3000");
+      const data = await res.json();
+      console.log(data);
+    },
+  },
   async mounted() {
-    const canvas = await html2canvas(this.$refs.shootingSpace);
-    console.log(canvas);
-    const res = await fetch("http://localhost:3000");
-    const data = await res.json();
-    console.log(data);
+    const canvas = await this.screenshot();
+    const image = await this.convertingCanvasToImage(canvas);
+    await this.sendingImageToServer(image);
   },
 };
 </script>
