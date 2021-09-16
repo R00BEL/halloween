@@ -1,5 +1,5 @@
 <template>
-  <div style="width: 100vw; height: 100vh">
+  <div style="width: 100vw; height: 100vh" ref="shootingSpace">
     <img :src="template" style="width: 100%; height: 100%" />
   </div>
 </template>
@@ -16,8 +16,8 @@ export default {
     };
   },
   async mounted() {
-    const picture = await html2canvas(document.body);
-    console.log(picture);
+    const canvas = await html2canvas(this.$refs.shootingSpace);
+    console.log(canvas);
     const res = await fetch("http://localhost:3000");
     const data = await res.json();
     console.log(data);
