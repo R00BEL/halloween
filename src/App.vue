@@ -19,15 +19,18 @@ export default {
     screenshot() {
       return html2canvas(this.$refs.shootingSpace);
     },
-    convertingCanvasToImage(canvas) {
-      const image = new Image();
+    convertingCanvasToFile(canvas) {
+      let arr = canvas.toDataURL().split(","),
+        mime = arr[0].match(/:(.*?);/)[1],
+        bstr = atob(arr[1]),
+        n = bstr.length,
+        u8arr = new Uint8Array(n);
 
-      image.onload = function () {
-        image.src = canvas.toDataURL("image/png");
-        image.crossOrigin = "anonymous";
-      };
+      while (n--) {
+        u8arr[n] = bstr.charCodeAt(n);
+      }
 
-      return image;
+      return new File([u8arr], "file", { type: mime });
     },
     async sendingImageToServer() {
       const res = await fetch("http://localhost:3000");
@@ -37,8 +40,8 @@ export default {
   },
   async mounted() {
     const canvas = await this.screenshot();
-    const image = await this.convertingCanvasToImage(canvas);
-    await this.sendingImageToServer(image);
+    const file = await this.convertingCanvasToFile(canvas);
+    await this.sendingImageToServer(file);
   },
 };
 </script>
