@@ -6,6 +6,7 @@ const fetch = (...args) =>
 const app = express();
 
 app.use(cors());
+require("dotenv").config();
 
 const getUser = async (accessToken) => {
   const response = await fetch("https://api.linkedin.com/v2/me", {
@@ -52,6 +53,12 @@ app.post("/", async (req, res) => {
     user.id
   );
   console.log(registeredPicture);
+});
+
+app.get("/registration/link", async (req, res) => {
+  res.send(
+    `https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=${process.env.CLIENT_ID}&redirect_uri=${process.env.REDIRECT_URL}&scope=r_liteprofile%20w_member_social`
+  );
 });
 
 app.listen(3000);
