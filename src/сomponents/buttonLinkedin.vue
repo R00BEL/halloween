@@ -3,6 +3,9 @@
 </template>
 
 <script>
+import { Localstorage } from "@/constants/localstorage";
+import router, { routesName } from "@/router";
+
 export default {
   name: "buttonLinkedin",
   methods: {
@@ -30,8 +33,8 @@ export default {
     }
 
     const body = await res.json();
-    localStorage.setItem("access-token", body.access_token);
-    window.location.href = "/screenshot-of-results";
+    localStorage.setItem(Localstorage.ACCESS_TOKEN, body.access_token);
+    await router.push({ name: routesName.SCREENSHOT_OF_RESULTS });
   },
 };
 </script>

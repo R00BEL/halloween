@@ -3,10 +3,15 @@ import VueRouter from "vue-router";
 
 Vue.use(VueRouter);
 
+export const routesName = {
+  SCREENSHOT_OF_RESULTS: "ScreenshotOfResults",
+  BUTTON_LINKEDIN: "buttonLinkedin",
+};
+
 const routes = [
   {
     path: "/screenshot-of-results",
-    name: "ScreenshotOfResults",
+    name: routesName.SCREENSHOT_OF_RESULTS,
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
@@ -17,7 +22,7 @@ const routes = [
   },
   {
     path: "/",
-    name: "buttonLinkedin",
+    name: routesName.BUTTON_LINKEDIN,
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
