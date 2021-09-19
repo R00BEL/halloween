@@ -1,14 +1,18 @@
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
+const fileupload = require("express-fileupload");
 const fetch = (...args) =>
   import("node-fetch").then(({ default: fetch }) => fetch(...args));
+
+var axios = require("axios");
 
 const app = express();
 
 app.use(cors());
 require("dotenv").config();
 app.use(bodyParser.json());
+app.use(fileupload());
 
 const getUser = async (accessToken) => {
   const response = await fetch("https://api.linkedin.com/v2/me", {
@@ -47,14 +51,76 @@ const registerAnUploadForImages = async (accessToken, userId) => {
   return response.json();
 };
 
+const imageUpload = async (registeredPicture, accessToken, file) => {
+  var config = {
+    method: "put",
+    url: registeredPicture.value.uploadMechanism[
+      "com.linkedin.digitalmedia.uploading.MediaUploadHttpRequest"
+    ].uploadUrl,
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+    data: file,
+  };
+
+  axios(config)
+    .then(function (response) {
+      console.log(JSON.stringify(response.data));
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+};
+
+const postCreation = async (registeredPicture, accessToken) => {
+  const body = {
+    owner: "urn:li:person:i5b4G5t0ea",
+    text: {
+      text: "http://localhost:8080111",
+    },
+    subject: "Test Share Subject",
+    distribution: {
+      linkedInDistributionTarget: {},
+    },
+    content: {
+      contentEntities: [
+        {
+          entity: `${registeredPicture.value.asset}`,
+        },
+      ],
+      title: "Test Share with Content title",
+      shareMediaCategory: "IMAGE",
+    },
+  };
+  const headers = {
+    Authorization: `Bearer ${accessToken}`,
+  };
+
+  axios({
+    url: "https://api.linkedin.com/v2/shares",
+    method: "post",
+    data: body,
+    headers: headers,
+  })
+    .then(function (response) {
+      console.log(JSON.stringify(response.data));
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+};
+
 app.post("/", async (req, res) => {
-  const accessToken = "11111111";
+  const accessToken = req.query.access_token;
+  console.log(accessToken);
   const user = await getUser(accessToken);
   const registeredPicture = await registerAnUploadForImages(
     accessToken,
     user.id
   );
-  console.log(registeredPicture);
+  await imageUpload(registeredPicture, accessToken, req.files.file);
+  // await postCreation(registeredPicture, accessToken);
+  res.send();
 });
 
 app.get("/registration/link", async (req, res) => {
