@@ -5,7 +5,7 @@ Vue.use(VueRouter);
 
 const routes = [
   {
-    path: "/",
+    path: "/screenshot-of-results",
     name: "ScreenshotOfResults",
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
@@ -13,6 +13,17 @@ const routes = [
     component: () =>
       import(
         /* webpackChunkName: "about" */ "../сomponents/ScreenshotOfResults.vue"
+      ),
+  },
+  {
+    path: "/",
+    name: "buttonLinkedin",
+    // route level code-splitting
+    // this generates a separate chunk (about.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () =>
+      import(
+        /* webpackChunkName: "about" */ "../сomponents/buttonLinkedin.vue"
       ),
   },
 ];
