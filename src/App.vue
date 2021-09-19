@@ -32,10 +32,11 @@ export default {
 
       return new File([u8arr], "file", { type: mime });
     },
-    async sendingImageToServer() {
-      const res = await fetch("http://localhost:3000");
-      const data = await res.json();
-      console.log(data);
+    async sendingImageToServer(file) {
+      await fetch("http://localhost:3000", {
+        method: "POST",
+        body: file,
+      });
     },
   },
   async mounted() {
