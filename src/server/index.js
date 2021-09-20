@@ -4,10 +4,6 @@ const bodyParser = require("body-parser");
 const fileupload = require("express-fileupload");
 const fetch = (...args) =>
   import("node-fetch").then(({ default: fetch }) => fetch(...args));
-const fs = require("fs");
-const path = require("path");
-
-var axios = require("axios");
 
 const app = express();
 
@@ -55,14 +51,16 @@ const registerAnUploadForImages = async (accessToken, userId) => {
 
 const imageUpload = async (registeredPicture, accessToken, file) => {
   var config = {
-    method: "put",
+    method: "post",
     headers: {
+      "cache-control": "no-cache",
+      "conent-type": "image/jpg",
+      "X-Restli-Protocol-Version": "2.0.0",
+      "x-li-format": "json",
       Authorization: `Bearer ${accessToken}`,
     },
     data: file.data,
   };
-
-  console.log(registeredPicture);
 
   try {
     const response = await fetch(
@@ -77,9 +75,9 @@ const imageUpload = async (registeredPicture, accessToken, file) => {
   }
 };
 
-const postCreation = async (registeredPicture, accessToken) => {
+const postCreation = async (registeredPicture, accessToken, userId) => {
   const body = {
-    owner: "urn:li:person:i5b4G5t0ea",
+    owner: `urn:li:person:${userId}`,
     text: {
       text: "http://localhost:8080",
     },
@@ -97,35 +95,34 @@ const postCreation = async (registeredPicture, accessToken) => {
       shareMediaCategory: "IMAGE",
     },
   };
-  const headers = {
-    Authorization: `Bearer ${accessToken}`,
+
+  const config = {
+    method: "post",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+    data: JSON.stringify(body),
   };
 
-  axios({
-    url: "https://api.linkedin.com/v2/shares",
-    method: "post",
-    data: body,
-    headers: headers,
-  })
-    .then(function (response) {
-      console.log(JSON.stringify(response.data));
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
+  try {
+    const response = await fetch("https://api.linkedin.com/v2/shares", config);
+    const body = await response.json();
+    console.log(body);
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 app.post("/", async (req, res) => {
-  const accessToken = req.query.access_token;
   console.log(req.files.file);
+  const accessToken = req.query.access_token;
   const user = await getUser(accessToken);
-  console.log(user);
   const registeredPicture = await registerAnUploadForImages(
     accessToken,
     user.id
   );
   await imageUpload(registeredPicture, accessToken, req.files.file);
-  // await postCreation(registeredPicture, accessToken);
+  await postCreation(registeredPicture, accessToken, user.id);
   res.send();
 });
 
