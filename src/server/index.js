@@ -4,6 +4,8 @@ const bodyParser = require("body-parser");
 const fileupload = require("express-fileupload");
 const fetch = (...args) =>
   import("node-fetch").then(({ default: fetch }) => fetch(...args));
+const fs = require("fs");
+const path = require("path");
 
 var axios = require("axios");
 
@@ -54,29 +56,32 @@ const registerAnUploadForImages = async (accessToken, userId) => {
 const imageUpload = async (registeredPicture, accessToken, file) => {
   var config = {
     method: "put",
-    url: registeredPicture.value.uploadMechanism[
-      "com.linkedin.digitalmedia.uploading.MediaUploadHttpRequest"
-    ].uploadUrl,
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
-    data: file,
+    data: file.data,
   };
 
-  axios(config)
-    .then(function (response) {
-      console.log(JSON.stringify(response.data));
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
+  console.log(registeredPicture);
+
+  try {
+    const response = await fetch(
+      registeredPicture.value.uploadMechanism[
+        "com.linkedin.digitalmedia.uploading.MediaUploadHttpRequest"
+      ].uploadUrl,
+      config
+    );
+    console.log(response);
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 const postCreation = async (registeredPicture, accessToken) => {
   const body = {
     owner: "urn:li:person:i5b4G5t0ea",
     text: {
-      text: "http://localhost:8080111",
+      text: "http://localhost:8080",
     },
     subject: "Test Share Subject",
     distribution: {
@@ -112,8 +117,9 @@ const postCreation = async (registeredPicture, accessToken) => {
 
 app.post("/", async (req, res) => {
   const accessToken = req.query.access_token;
-  console.log(accessToken);
+  console.log(req.files.file);
   const user = await getUser(accessToken);
+  console.log(user);
   const registeredPicture = await registerAnUploadForImages(
     accessToken,
     user.id
