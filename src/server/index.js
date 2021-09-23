@@ -49,15 +49,15 @@ const registerAnUploadForImages = async (accessToken, userId) => {
         },
       }
     );
-    console.log(response)
+    console.log(response);
     return response.json();
   } catch (err) {
-    console.log(err)
+    console.log(err);
   }
 };
 
 const imageUpload = async (registeredPicture, accessToken, file) => {
-    try {
+  try {
     const response = await fetch(
       registeredPicture.value.uploadMechanism[
         "com.linkedin.digitalmedia.uploading.MediaUploadHttpRequest"
