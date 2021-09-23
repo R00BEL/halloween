@@ -50,24 +50,18 @@ const registerAnUploadForImages = async (accessToken, userId) => {
 };
 
 const imageUpload = async (registeredPicture, accessToken, file) => {
-  var config = {
-    method: "post",
-    headers: {
-      "cache-control": "no-cache",
-      "conent-type": "image/jpg",
-      "X-Restli-Protocol-Version": "2.0.0",
-      "x-li-format": "json",
-      Authorization: `Bearer ${accessToken}`,
-    },
-    data: file.data,
-  };
-
-  try {
+    try {
     const response = await fetch(
       registeredPicture.value.uploadMechanism[
         "com.linkedin.digitalmedia.uploading.MediaUploadHttpRequest"
       ].uploadUrl,
-      config
+      {
+        method: "post",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: file.data,
+      }
     );
     console.log(response);
   } catch (err) {
@@ -101,7 +95,7 @@ const postCreation = async (registeredPicture, accessToken, userId) => {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
-    data: JSON.stringify(body),
+    body: JSON.stringify(body),
   };
 
   try {
@@ -114,7 +108,6 @@ const postCreation = async (registeredPicture, accessToken, userId) => {
 };
 
 app.post("/", async (req, res) => {
-  console.log(req.files.file);
   const accessToken = req.query.access_token;
   const user = await getUser(accessToken);
   const registeredPicture = await registerAnUploadForImages(
