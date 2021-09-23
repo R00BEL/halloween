@@ -7,6 +7,7 @@
 <script>
 import template from "../templates/banana.png";
 import html2canvas from "html2canvas";
+import { Localstorage } from "../constants/localstorage";
 
 export default {
   name: "App",
@@ -30,13 +31,22 @@ export default {
         u8arr[n] = bstr.charCodeAt(n);
       }
 
-      return new File([u8arr], "file", { type: mime });
+      return new File([u8arr], "fil", { type: mime });
     },
     async sendingImageToServer(file) {
-      await fetch("http://localhost:3000", {
-        method: "POST",
-        body: file,
-      });
+      const access_token = localStorage.getItem(Localstorage.ACCESS_TOKEN);
+      let formData = new FormData();
+      formData.append("file", file);
+      console.log(formData);
+
+      await fetch(
+        `http://localhost:3000/user/post?access_token=${access_token}`,
+        {
+          method: "POST",
+          "Content-Type": "multipart/form-data",
+          body: formData,
+        }
+      );
     },
   },
   async mounted() {

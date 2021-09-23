@@ -116,14 +116,29 @@ const postCreation = async (registeredPicture, accessToken, userId) => {
   }
 };
 
-app.post("/", async (req, res) => {
-  const accessToken = req.query.access_token;
+app.post("/user/post", async (req, res) => {
+  const accessToken = req.query?.access_token;
+  const file = req.files?.file;
+
+  if (!accessToken) {
+    return res
+      .status(400)
+      .json({ message: "Missing access_token in query params" });
+  }
+
+  if (!file) {
+    return res.status(400).json({
+      message:
+        "A file must be attached to the request. The file must be in the field 'file'",
+    });
+  }
+
   const user = await getUser(accessToken);
   const registeredPicture = await registerAnUploadForImages(
     accessToken,
     user.id
   );
-  await imageUpload(registeredPicture, accessToken, req.files.file);
+  await imageUpload(registeredPicture, accessToken, file);
   await postCreation(registeredPicture, accessToken, user.id);
   res.send();
 });
