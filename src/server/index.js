@@ -35,18 +35,25 @@ const registerAnUploadForImages = async (accessToken, userId) => {
       supportedUploadMechanism: ["SYNCHRONOUS_UPLOAD"],
     },
   };
-  const response = await fetch(
-    "https://api.linkedin.com/v2/assets?action=registerUpload",
-    {
-      method: "post",
-      body: JSON.stringify(body),
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${accessToken}`,
-      },
-    }
-  );
-  return response.json();
+
+  try {
+    const response = await fetch(
+      "https://api.linkedin.com/v2/assets?action=registerUpload",
+      {
+        method: "post",
+        body: JSON.stringify(body),
+        headers: {
+          "Content-Type": "application/json",
+          "X-Restli-Protocol-Version": "2.0.0",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+    console.log(response)
+    return response.json();
+  } catch (err) {
+    console.log(err)
+  }
 };
 
 const imageUpload = async (registeredPicture, accessToken, file) => {
@@ -56,8 +63,10 @@ const imageUpload = async (registeredPicture, accessToken, file) => {
         "com.linkedin.digitalmedia.uploading.MediaUploadHttpRequest"
       ].uploadUrl,
       {
-        method: "post",
+        method: "put",
         headers: {
+          "Content-Type": "application/octet-stream",
+          "X-Restli-Protocol-Version": "2.0.0",
           Authorization: `Bearer ${accessToken}`,
         },
         body: file.data,
@@ -73,7 +82,7 @@ const postCreation = async (registeredPicture, accessToken, userId) => {
   const body = {
     owner: `urn:li:person:${userId}`,
     text: {
-      text: "http://localhost:8080",
+      text: "Try to beat my record! http://localhost:8080",
     },
     subject: "Test Share Subject",
     distribution: {
