@@ -13,6 +13,15 @@ export default {
       const res = await fetch("http://localhost:3000/registration/link");
       window.location.href = await res.text();
     },
+    async checkToken(accessToken) {
+      const res = await fetch("http://localhost:3000/user", {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      return res.ok;
+    },
   },
   async mounted() {
     const code = this.$route.query.code;

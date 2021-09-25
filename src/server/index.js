@@ -127,6 +127,12 @@ const postCreation = async (registeredPicture, accessToken, userId) => {
   }
 };
 
+app.get("/registration/link", async (req, res) => {
+  res.send(
+    `https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=${process.env.CLIENT_ID}&redirect_uri=${process.env.REDIRECT_URL}&scope=r_liteprofile%20w_member_social`
+  );
+});
+
 app.post("/user/post", async (req, res) => {
   const accessToken = req.query?.access_token;
   const file = req.files?.file;
@@ -158,10 +164,22 @@ app.post("/user/post", async (req, res) => {
   res.send();
 });
 
-app.get("/registration/link", async (req, res) => {
-  res.send(
-    `https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=${process.env.CLIENT_ID}&redirect_uri=${process.env.REDIRECT_URL}&scope=r_liteprofile%20w_member_social`
-  );
+app.get("/user", async (req, res) => {
+  const [, accessToken] = req.headers.authorization.split(" ");
+
+  if (!accessToken) {
+    return res
+      .status(400)
+      .json({ message: "Missing access_token in query params" });
+  }
+
+  const user = await getUser(accessToken);
+
+  if (!user) {
+    return res.status(403).json();
+  }
+
+  res.send(user);
 });
 
 app.post("/user/access-token", async (req, res) => {
