@@ -10,7 +10,7 @@ import html2canvas from "html2canvas";
 import { Localstorage } from "../constants/localstorage";
 
 export default {
-  name: "App",
+  name: "screenshotOfResults",
   data() {
     return {
       template: template,

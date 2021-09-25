@@ -5,30 +5,19 @@ Vue.use(VueRouter);
 
 export const routesName = {
   SCREENSHOT_OF_RESULTS: "ScreenshotOfResults",
-  BUTTON_LINKEDIN: "buttonLinkedin",
+  AUTHORIZED_LINKEDIN: "AuthorizedLinkedin",
 };
 
 const routes = [
   {
-    path: "/screenshot-of-results",
-    name: routesName.SCREENSHOT_OF_RESULTS,
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () =>
-      import(
-        /* webpackChunkName: "about" */ "../сomponents/ScreenshotOfResults.vue"
-      ),
-  },
-  {
     path: "/",
-    name: routesName.BUTTON_LINKEDIN,
+    name: routesName.AUTHORIZED_LINKEDIN,
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
     component: () =>
       import(
-        /* webpackChunkName: "about" */ "../сomponents/buttonLinkedin.vue"
+        /* webpackChunkName: "about" */ "../сomponents/AuthorizedLinkedin.vue"
       ),
   },
 ];
