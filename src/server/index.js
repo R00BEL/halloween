@@ -13,12 +13,22 @@ app.use(bodyParser.json());
 app.use(fileupload());
 
 const getUser = async (accessToken) => {
-  const response = await fetch("https://api.linkedin.com/v2/me", {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
-  return response.json();
+  try {
+    const response = await fetch("https://api.linkedin.com/v2/me", {
+      headers: {
+        "X-Restli-Protocol-Version": "2.0.0",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (!response.ok) {
+      return null;
+    }
+
+    return response.json();
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 const registerAnUploadForImages = async (accessToken, userId) => {
@@ -36,20 +46,21 @@ const registerAnUploadForImages = async (accessToken, userId) => {
     },
   };
 
+  const config = {
+    method: "post",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Restli-Protocol-Version": "2.0.0",
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify(body),
+  };
+
   try {
     const response = await fetch(
       "https://api.linkedin.com/v2/assets?action=registerUpload",
-      {
-        method: "post",
-        body: JSON.stringify(body),
-        headers: {
-          "Content-Type": "application/json",
-          "X-Restli-Protocol-Version": "2.0.0",
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
+      config
     );
-    console.log(response);
     return response.json();
   } catch (err) {
     console.log(err);
@@ -57,22 +68,23 @@ const registerAnUploadForImages = async (accessToken, userId) => {
 };
 
 const imageUpload = async (registeredPicture, accessToken, file) => {
+  const url =
+    registeredPicture.value.uploadMechanism[
+      "com.linkedin.digitalmedia.uploading.MediaUploadHttpRequest"
+    ].uploadUrl;
+
+  const config = {
+    method: "put",
+    headers: {
+      "Content-Type": "application/octet-stream",
+      "X-Restli-Protocol-Version": "2.0.0",
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: file.data,
+  };
+
   try {
-    const response = await fetch(
-      registeredPicture.value.uploadMechanism[
-        "com.linkedin.digitalmedia.uploading.MediaUploadHttpRequest"
-      ].uploadUrl,
-      {
-        method: "put",
-        headers: {
-          "Content-Type": "application/octet-stream",
-          "X-Restli-Protocol-Version": "2.0.0",
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: file.data,
-      }
-    );
-    console.log(response);
+    await fetch(url, config);
   } catch (err) {
     console.log(err);
   }
@@ -109,8 +121,7 @@ const postCreation = async (registeredPicture, accessToken, userId) => {
 
   try {
     const response = await fetch("https://api.linkedin.com/v2/shares", config);
-    const body = await response.json();
-    console.log(body);
+    await response.json();
   } catch (err) {
     console.log(err);
   }
@@ -134,6 +145,10 @@ app.post("/user/post", async (req, res) => {
   }
 
   const user = await getUser(accessToken);
+  if (!user) {
+    return res.status(403).json();
+  }
+
   const registeredPicture = await registerAnUploadForImages(
     accessToken,
     user.id
@@ -159,7 +174,7 @@ app.post("/user/access-token", async (req, res) => {
   });
 
   if (!response.ok) {
-    return res.status(403);
+    return res.status(403).json();
   }
 
   const body = await response.json();

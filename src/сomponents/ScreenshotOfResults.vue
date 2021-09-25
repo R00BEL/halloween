@@ -31,13 +31,12 @@ export default {
         u8arr[n] = bstr.charCodeAt(n);
       }
 
-      return new File([u8arr], "fil", { type: mime });
+      return new File([u8arr], "file", { type: mime });
     },
     async sendingImageToServer(file) {
       const access_token = localStorage.getItem(Localstorage.ACCESS_TOKEN);
       let formData = new FormData();
       formData.append("file", file);
-      console.log(formData);
 
       await fetch(
         `http://localhost:3000/user/post?access_token=${access_token}`,
