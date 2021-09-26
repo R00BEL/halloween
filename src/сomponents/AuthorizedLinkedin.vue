@@ -9,6 +9,7 @@
 import screenshotOfResults from "./ScreenshotOfResults";
 import template from "../templates/banana.png";
 import { BACKEND_URL, Localstorage } from "../constants";
+import { createAccessToken, getUser } from "../services/userService";
 
 export default {
   name: "authorizedLinkedin",
@@ -27,28 +28,15 @@ export default {
       window.location.href = await res.text();
     },
     async checkToken(accessToken) {
-      const res = await fetch(`${BACKEND_URL}/user`, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-
-      return res.ok;
+      return !!(await getUser(accessToken));
     },
     async getToken(code) {
-      const res = await fetch(`${BACKEND_URL}/user/access-token`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ code }),
-      });
+      const body = await createAccessToken(code);
 
-      if (!res.ok) {
+      if (!body) {
         return;
       }
 
-      const body = await res.json();
       localStorage.setItem(Localstorage.ACCESS_TOKEN, body.access_token);
       return body;
     },

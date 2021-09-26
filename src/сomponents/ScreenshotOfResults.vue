@@ -7,7 +7,8 @@
 <script>
 import template from "../templates/banana.png";
 import html2canvas from "html2canvas";
-import { BACKEND_URL, Localstorage } from "../constants";
+import { Localstorage } from "../constants";
+import { createPost } from "../services/userService";
 
 export default {
   name: "screenshotOfResults",
@@ -34,15 +35,8 @@ export default {
       return new File([u8arr], "file", { type: mime });
     },
     async sendingImageToServer(file) {
-      const access_token = localStorage.getItem(Localstorage.ACCESS_TOKEN);
-      let formData = new FormData();
-      formData.append("file", file);
-
-      await fetch(`${BACKEND_URL}/user/post?access_token=${access_token}`, {
-        method: "POST",
-        "Content-Type": "multipart/form-data",
-        body: formData,
-      });
+      const accessToken = localStorage.getItem(Localstorage.ACCESS_TOKEN);
+      await createPost(file, accessToken);
     },
   },
   async mounted() {
