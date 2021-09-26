@@ -5,7 +5,7 @@ async function wrapperFetch(url, config, isAnswer = true) {
   const response = await fetch(url, config);
 
   if (!response.ok) {
-    throw { code: response.code };
+    throw { code: response.status };
   }
 
   if (isAnswer) {

@@ -1,11 +1,8 @@
-const wrapperFetch = require("./utils/wrapperFetch");
-
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const fileupload = require("express-fileupload");
-const fetch = (...args) =>
-  import("node-fetch").then(({ default: fetch }) => fetch(...args));
+const wrapperFetch = require("./utils/wrapperFetch");
 
 const app = express();
 
@@ -171,36 +168,29 @@ app.post("/user/post", async (req, res) => {
 app.get("/user", async (req, res) => {
   const [, accessToken] = req.headers.authorization.split(" ");
 
-  if (!accessToken) {
-    return res
-      .status(400)
-      .json({ message: "Missing access_token in query params" });
+  try {
+    const user = await getUser(accessToken);
+    res.send(user);
+  } catch (err) {
+    err.code === 401 ? res.status(401).json() : res.status(500).json();
   }
-
-  const user = await getUser(accessToken);
-
-  if (!user) {
-    return res.status(403).json();
-  }
-
-  res.send(user);
 });
 
 app.post("/user/access-token", async (req, res) => {
   const url = `https://www.linkedin.com/oauth/v2/accessToken?grant_type=authorization_code&code=${req.body.code}&client_id=${process.env.CLIENT_ID}&client_secret=${process.env.CLIENT_SECRET}&redirect_uri=${process.env.REDIRECT_URL}`;
-  const response = await fetch(url, {
+  const config = {
     method: "post",
     headers: {
       "Content-Type": "x-www-form-urlencoded",
     },
-  });
+  };
 
-  if (!response.ok) {
-    return res.status(403).json();
+  try {
+    const body = await wrapperFetch(url, config);
+    res.send(body);
+  } catch (err) {
+    err.code === 401 ? res.status(401).json() : res.status(500).json();
   }
-
-  const body = await response.json();
-  res.send(body);
 });
 
 app.listen(3000);
