@@ -1,3 +1,5 @@
+const wrapperFetch = require("./utils/wrapperFetch");
+
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
@@ -13,19 +15,17 @@ app.use(bodyParser.json());
 app.use(fileupload());
 
 const getUser = async (accessToken) => {
+  const url = "https://api.linkedin.com/v2/me";
+
+  const config = {
+    headers: {
+      "X-Restli-Protocol-Version": "2.0.0",
+      Authorization: `Bearer ${accessToken}`,
+    },
+  };
+
   try {
-    const response = await fetch("https://api.linkedin.com/v2/me", {
-      headers: {
-        "X-Restli-Protocol-Version": "2.0.0",
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-
-    if (!response.ok) {
-      return null;
-    }
-
-    return response.json();
+    return wrapperFetch.wrapperFetch(url, config);
   } catch (err) {
     console.error(err);
     throw { code: err.code, message: err.message };
@@ -33,6 +33,8 @@ const getUser = async (accessToken) => {
 };
 
 const registerImage = async (accessToken, userId) => {
+  const url = "https://api.linkedin.com/v2/assets?action=registerUpload";
+
   const body = {
     registerUploadRequest: {
       owner: `urn:li:person:${userId}`,
@@ -58,11 +60,7 @@ const registerImage = async (accessToken, userId) => {
   };
 
   try {
-    const response = await fetch(
-      "https://api.linkedin.com/v2/assets?action=registerUpload",
-      config
-    );
-    return response.json();
+    return wrapperFetch.wrapperFetch(url, config);
   } catch (err) {
     console.error(err);
     throw { code: err.code, message: err.message };
@@ -86,7 +84,7 @@ const imageUpload = async (registeredPicture, accessToken, file) => {
   };
 
   try {
-    await fetch(url, config);
+    await wrapperFetch.wrapperFetch(url, config, false);
   } catch (err) {
     console.error(err);
     throw { code: err.code, message: err.message };
@@ -94,6 +92,8 @@ const imageUpload = async (registeredPicture, accessToken, file) => {
 };
 
 const postCreation = async (registeredPicture, accessToken, userId) => {
+  const url = "https://api.linkedin.com/v2/shares";
+
   const body = {
     owner: `urn:li:person:${userId}`,
     text: {
@@ -123,8 +123,7 @@ const postCreation = async (registeredPicture, accessToken, userId) => {
   };
 
   try {
-    const response = await fetch("https://api.linkedin.com/v2/shares", config);
-    await response.json();
+    await wrapperFetch.wrapperFetch(url, config, false);
   } catch (err) {
     console.error(err);
     throw { code: err.code, message: err.message };
