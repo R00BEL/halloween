@@ -1,11 +1,14 @@
 import { BACKEND_URL } from "../constants";
 
-export const createPost = async (file, access_token) => {
+export const createPost = async (file, accessToken) => {
   let formData = new FormData();
   formData.append("file", file);
 
-  await fetch(`${BACKEND_URL}/user/post?access_token=${access_token}`, {
+  await fetch(`${BACKEND_URL}/user/post`, {
     method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
     "Content-Type": "multipart/form-data",
     body: formData,
   });

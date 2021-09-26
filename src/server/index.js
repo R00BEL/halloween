@@ -128,7 +128,7 @@ const postCreation = async (registeredPicture, accessToken, userId) => {
 };
 
 app.post("/user/post", async (req, res) => {
-  const accessToken = req.query?.access_token;
+  const [, accessToken] = req.headers.authorization.split(" ");
   const file = req.files?.file;
 
   if (!accessToken) {
