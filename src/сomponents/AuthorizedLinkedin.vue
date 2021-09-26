@@ -1,5 +1,5 @@
 <template>
-  <div style="width: 100vw; height: 100vh" ref="shootingSpace">
+  <div ref="shootingSpace" style="width: 100%; height: 100%">
     <screenshotOfResults v-if="isUserAuthorized" />
     <img v-else :src="template" style="width: 100%; height: 100%" />
   </div>
