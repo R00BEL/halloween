@@ -94,7 +94,7 @@ const postCreation = async (registeredPicture, accessToken, userId) => {
   const body = {
     owner: `urn:li:person:${userId}`,
     text: {
-      text: "Try to beat my record! http://localhost:8080",
+      text: "Try to beat my record! https://www.example.com/content.html",
     },
     subject: "Test Share Subject",
     distribution: {
