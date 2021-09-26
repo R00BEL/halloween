@@ -13,6 +13,4 @@ async function wrapperFetch(url, config, isAnswer = true) {
   }
 }
 
-module.exports = {
-  wrapperFetch,
-};
+module.exports = wrapperFetch;

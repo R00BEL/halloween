@@ -25,7 +25,7 @@ const getUser = async (accessToken) => {
   };
 
   try {
-    return wrapperFetch.wrapperFetch(url, config);
+    return wrapperFetch(url, config);
   } catch (err) {
     console.error(err);
     throw { code: err.code, message: err.message };
@@ -60,7 +60,7 @@ const registerImage = async (accessToken, userId) => {
   };
 
   try {
-    return wrapperFetch.wrapperFetch(url, config);
+    return wrapperFetch(url, config);
   } catch (err) {
     console.error(err);
     throw { code: err.code, message: err.message };
@@ -84,7 +84,7 @@ const imageUpload = async (registeredPicture, accessToken, file) => {
   };
 
   try {
-    await wrapperFetch.wrapperFetch(url, config, false);
+    await wrapperFetch(url, config, false);
   } catch (err) {
     console.error(err);
     throw { code: err.code, message: err.message };
@@ -123,7 +123,7 @@ const postCreation = async (registeredPicture, accessToken, userId) => {
   };
 
   try {
-    await wrapperFetch.wrapperFetch(url, config, false);
+    await wrapperFetch(url, config, false);
   } catch (err) {
     console.error(err);
     throw { code: err.code, message: err.message };
