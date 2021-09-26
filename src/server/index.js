@@ -27,7 +27,8 @@ const getUser = async (accessToken) => {
 
     return response.json();
   } catch (err) {
-    console.log(err);
+    console.error(err);
+    throw { code: err.code, message: err.message };
   }
 };
 
@@ -63,7 +64,8 @@ const registerImage = async (accessToken, userId) => {
     );
     return response.json();
   } catch (err) {
-    console.log(err);
+    console.error(err);
+    throw { code: err.code, message: err.message };
   }
 };
 
@@ -86,7 +88,8 @@ const imageUpload = async (registeredPicture, accessToken, file) => {
   try {
     await fetch(url, config);
   } catch (err) {
-    console.log(err);
+    console.error(err);
+    throw { code: err.code, message: err.message };
   }
 };
 
@@ -123,7 +126,8 @@ const postCreation = async (registeredPicture, accessToken, userId) => {
     const response = await fetch("https://api.linkedin.com/v2/shares", config);
     await response.json();
   } catch (err) {
-    console.log(err);
+    console.error(err);
+    throw { code: err.code, message: err.message };
   }
 };
 
@@ -150,15 +154,19 @@ app.post("/user/post", async (req, res) => {
     });
   }
 
-  const user = await getUser(accessToken);
-  if (!user) {
-    return res.status(403).json();
-  }
+  try {
+    const user = await getUser(accessToken);
+    if (!user) {
+      return res.status(403).json();
+    }
 
-  const registeredPicture = await registerImage(accessToken, user.id);
-  await imageUpload(registeredPicture, accessToken, file);
-  await postCreation(registeredPicture, accessToken, user.id);
-  res.send();
+    const registeredPicture = await registerImage(accessToken, user.id);
+    await imageUpload(registeredPicture, accessToken, file);
+    await postCreation(registeredPicture, accessToken, user.id);
+    res.send();
+  } catch (err) {
+    return res.status(500).json(err);
+  }
 });
 
 app.get("/user", async (req, res) => {
