@@ -6,9 +6,9 @@
 </template>
 
 <script>
-import { Localstorage } from "@/constants/localstorage";
 import screenshotOfResults from "./ScreenshotOfResults";
 import template from "../templates/banana.png";
+import { BACKEND_URL, Localstorage } from "../constants";
 
 export default {
   name: "authorizedLinkedin",
@@ -23,11 +23,11 @@ export default {
   },
   methods: {
     async authorizationRedirect() {
-      const res = await fetch("http://localhost:3000/registration/link");
+      const res = await fetch(`${BACKEND_URL}/registration/link`);
       window.location.href = await res.text();
     },
     async checkToken(accessToken) {
-      const res = await fetch("http://localhost:3000/user", {
+      const res = await fetch(`${BACKEND_URL}/user`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -36,7 +36,7 @@ export default {
       return res.ok;
     },
     async getToken(code) {
-      const res = await fetch("http://localhost:3000/user/access-token", {
+      const res = await fetch(`${BACKEND_URL}/user/access-token`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
