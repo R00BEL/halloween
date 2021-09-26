@@ -127,15 +127,28 @@ const postCreation = async (registeredPicture, accessToken, userId) => {
   }
 };
 
-app.post("/user/post", async (req, res) => {
-  const [, accessToken] = req.headers.authorization.split(" ");
-  const file = req.files?.file;
+const tokenVerification = async (req, res, next) => {
+  const authorization = req.headers?.authorization;
 
-  if (!accessToken) {
-    return res
-      .status(400)
-      .json({ message: "Missing access_token in query params" });
+  if (!authorization) {
+    return res.status(401).json();
   }
+
+  const [, accessToken] = req.headers.authorization.split(" ");
+
+  try {
+    req.user = await getUser(accessToken);
+    req.accessToken = accessToken;
+    next();
+  } catch (err) {
+    err.code === 401 ? res.status(401).json() : res.status(500).json();
+  }
+};
+
+app.post("/user/post", tokenVerification, async (req, res) => {
+  const userId = req.user.id;
+  const accessToken = req.accessToken;
+  const file = req.files?.file;
 
   if (!file) {
     return res.status(400).json({
@@ -145,29 +158,17 @@ app.post("/user/post", async (req, res) => {
   }
 
   try {
-    const user = await getUser(accessToken);
-    if (!user) {
-      return res.status(403).json();
-    }
-
-    const registeredPicture = await registerImage(accessToken, user.id);
+    const registeredPicture = await registerImage(accessToken, userId);
     await imageUpload(registeredPicture, accessToken, file);
-    await postCreation(registeredPicture, accessToken, user.id);
+    await postCreation(registeredPicture, accessToken, userId);
     res.send();
   } catch (err) {
     return res.status(500).json(err);
   }
 });
 
-app.get("/user", async (req, res) => {
-  const [, accessToken] = req.headers.authorization.split(" ");
-
-  try {
-    const user = await getUser(accessToken);
-    res.send(user);
-  } catch (err) {
-    err.code === 401 ? res.status(401).json() : res.status(500).json();
-  }
+app.get("/user", tokenVerification, async (req, res) => {
+  res.send(req.user);
 });
 
 app.post("/user/access-token", async (req, res) => {
