@@ -31,7 +31,7 @@ const getUser = async (accessToken) => {
   }
 };
 
-const registerAnUploadForImages = async (accessToken, userId) => {
+const registerImage = async (accessToken, userId) => {
   const body = {
     registerUploadRequest: {
       owner: `urn:li:person:${userId}`,
@@ -155,10 +155,7 @@ app.post("/user/post", async (req, res) => {
     return res.status(403).json();
   }
 
-  const registeredPicture = await registerAnUploadForImages(
-    accessToken,
-    user.id
-  );
+  const registeredPicture = await registerImage(accessToken, user.id);
   await imageUpload(registeredPicture, accessToken, file);
   await postCreation(registeredPicture, accessToken, user.id);
   res.send();
