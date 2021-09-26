@@ -127,12 +127,6 @@ const postCreation = async (registeredPicture, accessToken, userId) => {
   }
 };
 
-app.get("/registration/link", async (req, res) => {
-  res.send(
-    `https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=${process.env.CLIENT_ID}&redirect_uri=${process.env.REDIRECT_URL}&scope=r_liteprofile%20w_member_social`
-  );
-});
-
 app.post("/user/post", async (req, res) => {
   const accessToken = req.query?.access_token;
   const file = req.files?.file;

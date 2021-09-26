@@ -8,7 +8,7 @@
 <script>
 import screenshotOfResults from "./ScreenshotOfResults";
 import template from "../templates/banana.png";
-import { BACKEND_URL, Localstorage } from "../constants";
+import { Linkedin, Localstorage } from "../constants";
 import { createAccessToken, getUser } from "../services/userService";
 
 export default {
@@ -24,8 +24,8 @@ export default {
   },
   methods: {
     async authorizationRedirect() {
-      const res = await fetch(`${BACKEND_URL}/registration/link`);
-      window.location.href = await res.text();
+      const url = `https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=${Linkedin.CLIENT_ID}&redirect_uri=${Linkedin.REDIRECT_URL}&scope=r_liteprofile%20w_member_social`;
+      window.location.href = url;
     },
     async checkToken(accessToken) {
       return !!(await getUser(accessToken));
